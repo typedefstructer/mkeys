@@ -15,7 +15,9 @@
 #define APP_STARTUP 102
 #define WM_TRAYSHOW WM_USER + 1
 
+
 global bool startup_state;
+global int speed = 10;
 
 void showtrayicon(HWND window)
 {
@@ -94,10 +96,7 @@ void movemouse(int dir)
 	POINT pt;
 	GetCursorPos(&pt);
 	int x , y;
-	int speed = 10;
-	x = pt.x;
-	y = pt.y;
-
+	x = y = 0;
 
 	switch(dir)
 	{
@@ -107,24 +106,27 @@ void movemouse(int dir)
 		{
 			if(dir == up)
 			{
-				y -= speed;
+				y = -speed;
+			}
+			else if(dir == down)
+			{
+				y  = speed;
+			}
+			else if(dir == left)
+			{
+				x = -speed;
+			}
+			else if(dir == right)
+			{
+				x = speed;
 			}
 
-			if(dir == down)
-			{
-				y += speed;
-			}
-
-			if(dir == left)
-			{
-				x -= speed;
-			}
-
-			if(dir == right)
-			{
-				x += speed;
-			}
-			SetCursorPos(x, y);
+			INPUT input ={};
+			input.type = INPUT_MOUSE;
+			input.mi.dx = x;
+			input.mi.dy = y;
+			input.mi.dwFlags = MOUSEEVENTF_MOVE;
+			SendInput(1, &input, sizeof(input));
 		}
 	}
 }
@@ -271,8 +273,8 @@ WinMain(HINSTANCE instance, HINSTANCE previnstance,
 
 	RegisterHotKey(window, 8, 0, VK_NUMPAD8);
 
-	RegisterHotKey(window, 9, MOD_NOREPEAT, VK_NUMPAD9);
-	RegisterHotKey(window, 7, MOD_NOREPEAT, VK_NUMPAD7);
+	RegisterHotKey(window, 9, 0, VK_NUMPAD9);
+	RegisterHotKey(window, 7, 0, VK_NUMPAD7);
 
 	MSG message;
 	while(GetMessage(&message, 0, 0, 0) > 0)
